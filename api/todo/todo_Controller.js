@@ -35,7 +35,7 @@ exports.createTodo = (req, res) => {
 // get all todo items
 // not considering the user
 exports.fetchAllTodoItems = (req, res) => {
-  Todo.find({ archived: false }).then((todos) => {
+  Todo.find({ archived: false }).sort({ createdAt: -1 }).then((todos) => {
     if (todos.length === 0) {
       res.status(404).json({ message: "No Todo items" });
     }
@@ -46,7 +46,7 @@ exports.fetchAllTodoItems = (req, res) => {
 // fetch user todos
 exports.fetchUserTodos = (req, res) => {
   const { user } = req.session;
-  Todo.find({ user, archived: false }).then((userTodos) => {
+  Todo.find({ user, archived: false }).sort({ createdAt: -1 }).then((userTodos) => {
     if (userTodos.length === 0) {
       return res.status(404).json({ message: "You don't have any todo items" });
     }
@@ -58,7 +58,7 @@ exports.fetchUserTodos = (req, res) => {
 
 // list uncompleted todos
 exports.fetchUnCompletedTodos = (req, res) => {
-  Todo.find({ completed: false, archived: false }).then((unCompletedTodos) => {
+  Todo.find({ completed: false, archived: false }).sort({ createdAt: -1 }).then((unCompletedTodos) => {
     if (unCompletedTodos.length === 0) {
       return res.status(404).json({ message: "You don't have any todo items" });
     }
@@ -85,7 +85,7 @@ exports.updateUnCompletedTodos = (req, res) => {
 
 // list completed todos
 exports.fetchCompletedTodos = (req, res) => {
-  Todo.find({ completed: true, archived: false }).then((completedTodos) => {
+  Todo.find({ completed: true, archived: false }).sort({ createdAt: -1 }).then((completedTodos) => {
     if (completedTodos.length === 0) {
       return res.status(404).json({ message: "You don't have any todo items" });
     }
