@@ -29,7 +29,7 @@ exports.registerUser = (req, res, next) => {
       .then((response) => {
         sendMail.sendConfirmEmail(response);
         return res.status(statusCode.OK).json({
-          messages: "Account created. Check your email to activate account",
+          message: "Account created. Check your email to activate account",
           data: response,
         });
       })

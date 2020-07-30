@@ -9,16 +9,15 @@ const todoSchema = new Schema(
     },
     category: {
       type: String,
-      required: true,
       default: "todo"
     },
-    tags: [{}],
+    tags: String,
     startTime: {
-      type: Date,
+      type: String,
       required: false,
     },
     endTime: {
-      type: Date,
+      type: String,
       required: false,
     },
     duration: {

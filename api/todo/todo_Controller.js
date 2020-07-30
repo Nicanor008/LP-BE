@@ -17,7 +17,7 @@ exports.createTodo = (req, res) => {
       completed,
     });
     // Todo.insertMany
-    Todo.insertMany(req.body).then((todoItem) => {
+    todo.save().then((todoItem) => {
       return res
         .status(200)
         .json({ message: "Todo Item created", data: todoItem });
