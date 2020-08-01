@@ -58,7 +58,7 @@ exports.fetchUserTodos = (req, res) => {
 
 // list uncompleted todos
 exports.fetchUnCompletedTodos = (req, res) => {
-  Todo.find({ completed: false, archived: false }).sort({ createdAt: -1 }).then((unCompletedTodos) => {
+  Todo.find({ completed: false, archived: false, user: req.id }).sort({ createdAt: -1 }).then((unCompletedTodos) => {
     if (unCompletedTodos.length === 0) {
       return res.status(404).json({ message: "You don't have any todo items" });
     }
@@ -99,8 +99,8 @@ exports.fetchCompletedTodos = (req, res) => {
 // soft delete todo items items
 // archive todo
 exports.archivedTodo = (req, res) => {
-  const { archived } = req.body;
-  Todo.findOneAndUpdate({ _id: req.params._id }, { archived: !archived }).then(
+    const { archived } = req.body;
+    Todo.findOneAndUpdate({ _id: req.params._id }, { archived: !archived }).then(
     (archivedTodo) => {
       if (!archivedTodo) {
         return res.status(404).json({ message: "Todo item doesn't exists" });

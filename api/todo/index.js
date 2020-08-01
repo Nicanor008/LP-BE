@@ -18,7 +18,7 @@ router
 router.route("/complete").get(isAuth, todoControllers.fetchCompletedTodos);
 router.route("/ongoing").get(isAuth, todoControllers.fetchUnCompletedTodos);
 router
-  .route("/ongoing/:id")
+  .route("/status/:id") // mark as done/ongoing
   .patch(isAuth, todoControllers.updateUnCompletedTodos);
 
 // archives

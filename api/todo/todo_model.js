@@ -21,9 +21,8 @@ const todoSchema = new Schema(
       required: false,
     },
     duration: {
-      type: Number,
-      required: false,
-      default: 0
+      type: String,
+      required: false
     },
     completed: {
       type: Boolean,
