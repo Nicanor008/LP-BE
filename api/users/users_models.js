@@ -29,7 +29,7 @@ const userSchema = new Schema(
     verified: {
       type: Boolean,
       required: true,
-      default: false,
+      default: true,
     },
     pictureUrl: {
         type: String,
