@@ -1,12 +1,30 @@
 const Todo = require("./todo_model");
 
 exports.createTodo = (req, res) => {
-  const { name, startTime, endTime, duration, category, completed } = req.body;
+  const {
+    name,
+    startTime,
+    endTime,
+    duration,
+    category,
+    completed,
+    user,
+  } = req.body;
   if (name === "") {
     return res.status(404).json({ message: "Todo item name is required" });
   }
-  if (req.session.isLoggedIn) {
-    const user = req.session.user;
+
+  // if the same todo name exists, don't add to db
+  Todo.find({ name, archived: false, completed: false }).then((resp) => {
+    resp.map((duplicate) => {
+      if (duplicate.user.toString() === user) {
+        return res
+          .status(409)
+          .json({
+            message: "Todo Item name already exists, be sure to change",
+          });
+      }
+    });
     const todo = new Todo({
       name,
       startTime,
@@ -22,51 +40,54 @@ exports.createTodo = (req, res) => {
         .status(200)
         .json({ message: "Todo Item created", data: todoItem });
     });
-  } else {
-    const todo = new Todo(req.body);
-    todo.save().then((todoItem) => {
-      return res
-        .status(200)
-        .json({ message: "Todo Item created", data: todoItem });
-    });
-  }
+  });
 };
 
 // get all todo items
 // not considering the user
 exports.fetchAllTodoItems = (req, res) => {
-  Todo.find({ archived: false }).sort({ updatedAt: -1 }).then((todos) => {
-    if (todos.length === 0) {
-      res.status(404).json({ message: "No Todo items" });
-    }
-    res.status(200).json({ message: "All Todo Items", data: todos });
-  });
+  Todo.find({ archived: false })
+    .sort({ updatedAt: -1 })
+    .then((todos) => {
+      if (todos.length === 0) {
+        res.status(404).json({ message: "No Todo items" });
+      }
+      res.status(200).json({ message: "All Todo Items", data: todos });
+    });
 };
 
 // fetch user todos
 exports.fetchUserTodos = (req, res) => {
   const { user } = req.session;
-  Todo.find({ user, archived: false }).sort({ updatedAt: -1 }).then((userTodos) => {
-    if (userTodos.length === 0) {
-      return res.status(404).json({ message: "You don't have any todo items" });
-    }
-    return res
-      .status(200)
-      .json({ message: "Your all todo items", data: userTodos });
-  });
+  Todo.find({ user, archived: false })
+    .sort({ updatedAt: -1 })
+    .then((userTodos) => {
+      if (userTodos.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "You don't have any todo items" });
+      }
+      return res
+        .status(200)
+        .json({ message: "Your all todo items", data: userTodos });
+    });
 };
 
 // list uncompleted todos
 exports.fetchUnCompletedTodos = (req, res) => {
-  Todo.find({ completed: false, archived: false, user: req.id }).sort({ updatedAt: -1 }).then((unCompletedTodos) => {
-    if (unCompletedTodos.length === 0) {
-      return res.status(404).json({ message: "You don't have any todo items" });
-    }
-    return res.status(200).json({
-      message: `${unCompletedTodos.length} Ongoing Todo`,
-      data: unCompletedTodos,
+  Todo.find({ completed: false, archived: false, user: req.id })
+    .sort({ updatedAt: -1 })
+    .then((unCompletedTodos) => {
+      if (unCompletedTodos.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "You don't have any todo items" });
+      }
+      return res.status(200).json({
+        message: `${unCompletedTodos.length} Ongoing Todo`,
+        data: unCompletedTodos,
+      });
     });
-  });
 };
 
 // update todo item to finished
@@ -85,22 +106,26 @@ exports.updateUnCompletedTodos = (req, res) => {
 
 // list completed todos
 exports.fetchCompletedTodos = (req, res) => {
-  Todo.find({ completed: true, archived: false }).sort({ updatedAt: -1 }).then((completedTodos) => {
-    if (completedTodos.length === 0) {
-      return res.status(404).json({ message: "You don't have any todo items" });
-    }
-    return res.status(200).json({
-      message: `${completedTodos.length} Todo done`,
-      data: completedTodos,
+  Todo.find({ completed: true, archived: false })
+    .sort({ updatedAt: -1 })
+    .then((completedTodos) => {
+      if (completedTodos.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "You don't have any todo items" });
+      }
+      return res.status(200).json({
+        message: `${completedTodos.length} Todo done`,
+        data: completedTodos,
+      });
     });
-  });
 };
 
 // soft delete todo items items
 // archive todo
 exports.archivedTodo = (req, res) => {
-    const { archived } = req.body;
-    Todo.findOneAndUpdate({ _id: req.params._id }, { archived: !archived }).then(
+  const { archived } = req.body;
+  Todo.findOneAndUpdate({ _id: req.params._id }, { archived: !archived }).then(
     (archivedTodo) => {
       if (!archivedTodo) {
         return res.status(404).json({ message: "Todo item doesn't exists" });
