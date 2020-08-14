@@ -27,10 +27,26 @@ exports.registerUser = (req, res, next) => {
         return user.save();
       })
       .then((response) => {
-        sendMail.sendConfirmEmail(response);
-        return res.status(statusCode.OK).json({
-          message: "Account created. Check your email to activate account",
-          data: response,
+        // sendMail.sendConfirmEmail(response);
+        const payload = {
+          id: response._id,
+          email: response.email,
+        };
+        jwt.sign(payload, process.env.SECRET_KEY, (err, token) => {
+          if (err) {
+            return res
+              .status(statusCode.SERVICE_UNAVAILABLE)
+              .json({ message: "Something went happen. Try again.", err });
+          }
+          req.session.isLoggedIn = true;
+          req.session.user = response._id;
+          req.session.save((err) => {
+            return res.status(statusCode.CREATED).json({
+              message: "Account created successfully",
+              token: "Bearer " + token,
+              data: response,
+            });
+          });
         });
       })
       .catch((error) => {
