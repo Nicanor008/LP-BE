@@ -1,6 +1,6 @@
 const User = require("./users_models");
 const statusCode = require("http-status");
-
+const jwt = require('jsonwebtoken')
 // all users
 exports.fetchAllUsers = (req, res) => {
   User.find()
@@ -20,6 +20,29 @@ exports.fetchAllUsers = (req, res) => {
         .json({ message: "Something went happen. Try again", error });
     });
 };
+
+// get current user, logged in user
+exports.getSingleUser = (req, res) => {
+  // const email = req.params.token.substr(7).email
+  User.findOne({ _id:req.id }).then(user => {
+    if(!user) {
+      return res.status(404).json({
+        message: "No active User"
+      })
+    }
+
+    // return the user details
+    return res.status(200).json({
+      message: 'Current User details',
+      data: user
+    })
+  }).catch(error => {
+    return res.status(500).json({
+      message: "Something went Wrong, try again",
+      error
+    })
+  })
+}
 
 // filter all authors
 // search users as per users name or role
