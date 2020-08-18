@@ -9,6 +9,7 @@ exports.createTodo = (req, res) => {
     category,
     completed,
     user,
+    tags
   } = req.body;
   if (name === "") {
     return res.status(404).json({ message: "Todo item name is required" });
@@ -18,11 +19,9 @@ exports.createTodo = (req, res) => {
   Todo.find({ name, archived: false, completed: false }).then((resp) => {
     resp.map((duplicate) => {
       if (duplicate.user.toString() === user) {
-        return res
-          .status(409)
-          .json({
-            message: "Todo Item name already exists, be sure to change",
-          });
+        return res.status(409).json({
+          message: "Todo Item name already exists, be sure to change",
+        });
       }
     });
     const todo = new Todo({
@@ -33,8 +32,8 @@ exports.createTodo = (req, res) => {
       user,
       category,
       completed,
+      tags
     });
-    // Todo.insertMany
     todo.save().then((todoItem) => {
       return res
         .status(200)
@@ -114,6 +113,8 @@ exports.fetchCompletedTodos = (req, res) => {
           .status(404)
           .json({ message: "You don't have any todo items" });
       }
+      // const lastUpdated = completedTodos.map(d => d.updatedAt)
+      // console.log( ">>>>>>>>......>>>......", new Date().toString())
       return res.status(200).json({
         message: `${completedTodos.length} Todo done`,
         data: completedTodos,
