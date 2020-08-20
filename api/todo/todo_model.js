@@ -24,6 +24,10 @@ const todoSchema = new Schema(
       type: String,
       required: false
     },
+    durationInteger: {
+      type: Number,
+      required: false
+    },
     completed: {
       type: Boolean,
       required: true,

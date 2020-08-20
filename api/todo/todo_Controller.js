@@ -9,7 +9,8 @@ exports.createTodo = (req, res) => {
     category,
     completed,
     user,
-    tags
+    durationInteger,
+    tags,
   } = req.body;
   if (name === "") {
     return res.status(404).json({ message: "Todo item name is required" });
@@ -32,7 +33,9 @@ exports.createTodo = (req, res) => {
       user,
       category,
       completed,
-      tags
+      tags,
+      durationInteger,
+      category: "todo",
     });
     todo.save().then((todoItem) => {
       return res
