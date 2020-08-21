@@ -1,4 +1,5 @@
 const Todo = require("./todo_model");
+const mongoose =require("mongoose")
 
 exports.createTodo = (req, res) => {
   const {
@@ -25,12 +26,13 @@ exports.createTodo = (req, res) => {
         });
       }
     });
+    console.log(">>>>>>>>....>>.......", user)
     const todo = new Todo({
       name,
       startTime,
       endTime,
       duration,
-      user,
+      user: mongoose.Types.ObjectId(user),
       category,
       completed,
       tags,
