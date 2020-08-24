@@ -26,12 +26,12 @@ exports.getAnalytics = (req, res) => {
         } else {
           todoUnArchivedItems.push(filteredData)
         }
-        if (filteredData.completed) {
+        if (filteredData.completed && !filteredData.archived) {
           todoCompletedItems.push(filteredData)
           if (filteredData.durationInteger) {
             tempTodoCompleteDuration.push(filteredData.durationInteger);
           }
-        } else if (!filteredData.completed) {
+        } else if (!filteredData.completed && !filteredData.archived) {
           todoUnCompletedItems.push(filteredData)
           if (filteredData.durationInteger) {
             tempTodoUnCompleteDuration.push(filteredData.durationInteger);

@@ -26,7 +26,6 @@ exports.createTodo = (req, res) => {
         });
       }
     });
-    console.log(">>>>>>>>....>>.......", user)
     const todo = new Todo({
       name,
       startTime,
@@ -43,7 +42,12 @@ exports.createTodo = (req, res) => {
       return res
         .status(200)
         .json({ message: "Todo Item created", data: todoItem });
-    });
+    }).catch(error => {
+      return res.status(500).json({
+        message: "Something went wrong, Try again",
+        error
+      })
+    })
   });
 };
 
