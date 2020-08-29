@@ -1,5 +1,5 @@
 const Todo = require("./todo_model");
-const mongoose =require("mongoose")
+const mongoose = require("mongoose");
 
 exports.createTodo = (req, res) => {
   const {
@@ -34,20 +34,23 @@ exports.createTodo = (req, res) => {
       user: mongoose.Types.ObjectId(user),
       category,
       completed,
-      tags,
+      tags: tags.toLowerCase(),
       durationInteger,
       category: "todo",
     });
-    todo.save().then((todoItem) => {
-      return res
-        .status(200)
-        .json({ message: "Todo Item created", data: todoItem });
-    }).catch(error => {
-      return res.status(500).json({
-        message: "Something went wrong, Try again",
-        error
+    todo
+      .save()
+      .then((todoItem) => {
+        return res
+          .status(200)
+          .json({ message: "Todo Item created", data: todoItem });
       })
-    })
+      .catch((error) => {
+        return res.status(500).json({
+          message: "Something went wrong, Try again",
+          error,
+        });
+      });
   });
 };
 
@@ -81,6 +84,20 @@ exports.fetchUserTodos = (req, res) => {
     });
 };
 
+function groupBy(list, keyGetter) {
+  const map = new Map();
+  list.forEach((item) => {
+    const key = keyGetter(item);
+    const collection = map.get(key);
+    if (!collection) {
+      map.set(key, [item]);
+    } else {
+      collection.push(item);
+    }
+  });
+  return map;
+}
+
 // list uncompleted todos
 exports.fetchUnCompletedTodos = (req, res) => {
   Todo.find({ completed: false, archived: false, user: req.id })
@@ -91,9 +108,11 @@ exports.fetchUnCompletedTodos = (req, res) => {
           .status(404)
           .json({ message: "You don't have any todo items" });
       }
+      const grouped = groupBy(unCompletedTodos, (tags) => tags.tags);
       return res.status(200).json({
         message: `${unCompletedTodos.length} Ongoing Todo`,
         data: unCompletedTodos,
+        groupedByKeywords: [...grouped],
       });
     });
 };
@@ -122,11 +141,11 @@ exports.fetchCompletedTodos = (req, res) => {
           .status(404)
           .json({ message: "You don't have any todo items" });
       }
-      // const lastUpdated = completedTodos.map(d => d.updatedAt)
-      // console.log( ">>>>>>>>......>>>......", new Date().toString())
+      const grouped = groupBy(completedTodos, (tags) => tags.tags);
       return res.status(200).json({
         message: `${completedTodos.length} Todo done`,
         data: completedTodos,
+        groupedByKeywords: [...grouped],
       });
     });
 };
@@ -239,3 +258,19 @@ exports.listTodoByTags = (req, res) => {
         .json({ message: `${data.length} todo with tag ${tag}`, data });
     });
 };
+
+// fetch all todo and group into relevant tags
+// exports.groupTodoByTags = (req, res) => {
+//   Todo.find({ user: req.id })
+//     .sort({ updatedAt: -1 })
+//     .then((data) => {
+//       if (!data.length) {
+//         return res
+//           .status(200)
+//           .json({ message: `No todo with  tag ${tag} found` });
+//       }
+//       return res
+//         .status(200)
+//         .json({ message: `${data.length} todo with tag ${tag}`, data });
+//     });
+// };
