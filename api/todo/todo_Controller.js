@@ -2,7 +2,7 @@ const Todo = require("./todo_model");
 const mongoose = require("mongoose");
 
 exports.createTodo = (req, res) => {
-  const {
+  let {
     name,
     startTime,
     endTime,
@@ -26,6 +26,8 @@ exports.createTodo = (req, res) => {
         });
       }
     });
+    tags = tags.toLowerCase()
+    tags = tags.charAt(0).toUpperCase().concat(tags.slice(1))
     const todo = new Todo({
       name,
       startTime,
@@ -34,7 +36,7 @@ exports.createTodo = (req, res) => {
       user: mongoose.Types.ObjectId(user),
       category,
       completed,
-      tags: tags.toLowerCase(),
+      tags,
       durationInteger,
       category: "todo",
     });
