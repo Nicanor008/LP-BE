@@ -135,7 +135,7 @@ exports.updateUnCompletedTodos = (req, res) => {
 
 // list completed todos
 exports.fetchCompletedTodos = (req, res) => {
-  Todo.find({ completed: true, archived: false })
+  Todo.find({ completed: true, archived: false, user: req.id })
     .sort({ updatedAt: -1 })
     .then((completedTodos) => {
       if (completedTodos.length === 0) {
