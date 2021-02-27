@@ -86,15 +86,26 @@ exports.fetchUserTodos = (req, res) => {
     });
 };
 
-function groupBy(list, keyGetter) {
+function groupBy(list, sortBy24hours, keyGetter) {
   const map = new Map();
   list.forEach((item) => {
-    const key = keyGetter(item);
-    const collection = map.get(key);
-    if (!collection) {
-      map.set(key, [item]);
-    } else {
-      collection.push(item);
+    const timeDifference = (new Date(item.updatedAt).valueOf() - new Date().valueOf()) / 1000 / 60 / 60;
+    if (sortBy24hours && timeDifference >= -24) {
+      const key = keyGetter(item);
+      const collection = map.get(key);
+      if (!collection) {
+        map.set(key, [item]);
+      } else {
+        collection.push(item);
+      }
+    } else if (!sortBy24hours) {
+      const key = keyGetter(item);
+      const collection = map.get(key);
+      if (!collection) {
+        map.set(key, [item]);
+      } else {
+        collection.push(item);
+      }
     }
   });
   return map;
@@ -110,7 +121,7 @@ exports.fetchUnCompletedTodos = (req, res) => {
           .status(404)
           .json({ message: "You don't have any todo items" });
       }
-      const grouped = groupBy(unCompletedTodos, (tags) => tags.tags);
+      const grouped = groupBy(unCompletedTodos, false, (tags) => tags.tags);
       return res.status(200).json({
         message: `${unCompletedTodos.length} Ongoing Todo`,
         data: unCompletedTodos,
@@ -143,7 +154,7 @@ exports.fetchCompletedTodos = (req, res) => {
           .status(404)
           .json({ message: "You don't have any todo items" });
       }
-      const grouped = groupBy(completedTodos, (tags) => tags.tags);
+      const grouped = groupBy(completedTodos, true, (tags) => tags.tags);
       return res.status(200).json({
         message: `${completedTodos.length} Todo done`,
         data: completedTodos,
