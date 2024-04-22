@@ -2,12 +2,12 @@
 An advanced todo with analytics
 
 ## Getting Started
-- git clone and `cd 10DaysOfNodeJS/LP`
+- git clone and `cd LP-BE`
 - `yarn` to install dependencies
 - Copy `.env.example` to a new `.env` file on LP root folder
 - `yarn test` to run unit tests
 - `yarn dev` to run local server
-- On browser, navigate `http://localhost:/docs` to test all endpoints
+- On browser, navigate `http://localhost:4003/docs` to test all endpoints
 - Alternatively, you can test the API endpoints on **postman**
 
 <!-- plan -->
